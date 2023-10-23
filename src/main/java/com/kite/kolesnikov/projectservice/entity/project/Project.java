@@ -1,30 +1,49 @@
 package com.kite.kolesnikov.projectservice.entity.project;
 
 import com.kite.kolesnikov.projectservice.entity.Moment;
-import com.kite.kolesnikov.projectservice.entity.resource.Resource;
 import com.kite.kolesnikov.projectservice.entity.Schedule;
-import com.kite.kolesnikov.projectservice.entity.task.Task;
 import com.kite.kolesnikov.projectservice.entity.Team;
-import com.kite.kolesnikov.projectservice.entity.vacancy.Vacancy;
+import com.kite.kolesnikov.projectservice.entity.resource.Resource;
 import com.kite.kolesnikov.projectservice.entity.stage.Stage;
-import jakarta.persistence.*;
+import com.kite.kolesnikov.projectservice.entity.task.Task;
+import com.kite.kolesnikov.projectservice.entity.vacancy.Vacancy;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Version;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Setter
+@Getter
+@Builder
 @Entity
-@Table(name = "project")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Table(name = "project")
 public class Project {
 
     @Id
@@ -46,8 +65,8 @@ public class Project {
     @Column(name = "owner_id")
     private Long ownerId;
 
-    @ManyToOne(cascade={CascadeType.ALL})
-    @JoinColumn(name="parent_project_id")
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "parent_project_id")
     private Project parentProject;
 
     @OneToMany(mappedBy = "parentProject", fetch = FetchType.EAGER)

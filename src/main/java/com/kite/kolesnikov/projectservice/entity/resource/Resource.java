@@ -1,11 +1,8 @@
 package com.kite.kolesnikov.projectservice.entity.resource;
 
 import com.kite.kolesnikov.projectservice.entity.TeamMember;
-import com.kite.kolesnikov.projectservice.entity.TeamRole;
 import com.kite.kolesnikov.projectservice.entity.project.Project;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,24 +14,25 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Version;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "resource")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "resource")
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,13 +44,6 @@ public class Resource {
     private String key;
 
     private BigInteger size;
-
-    @ElementCollection(targetClass = TeamRole.class)
-    @CollectionTable(name = "resource_allowed_roles",
-            joinColumns = @JoinColumn(name = "resource_id"))
-    @Column(name = "role_id")
-    @Enumerated(EnumType.STRING)
-    private List<TeamRole> allowedRoles;
 
     @Enumerated(EnumType.STRING)
     private ResourceType type;

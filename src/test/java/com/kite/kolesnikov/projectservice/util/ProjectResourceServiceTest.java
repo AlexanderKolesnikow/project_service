@@ -44,6 +44,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class ProjectResourceServiceTest {
@@ -63,7 +64,6 @@ public class ProjectResourceServiceTest {
     private ProjectResourceService projectFileService;
 
     private Project project;
-    private Project expectedProject;
     private MockMultipartFile multipartFile;
     private Resource resource;
     private TeamMember teamMember;
@@ -99,15 +99,6 @@ public class ProjectResourceServiceTest {
                 .teams(new ArrayList<>(List.of(team)))
                 .build();
 
-        expectedProject = Project.builder()
-                .id(1L)
-                .maxStorageSize(BigInteger.valueOf(12L))
-                .status(ProjectStatus.CREATED)
-                .visibility(ProjectVisibility.PUBLIC)
-                .createdAt(createdAt)
-                .teams(new ArrayList<>(List.of(team)))
-                .build();
-
         multipartFile = new MockMultipartFile(
                 "testFile", "test.txt", "text/plain", "Test content".getBytes());
 
@@ -128,7 +119,6 @@ public class ProjectResourceServiceTest {
 
     @Test
     public void testUploadFile_Successful() {
-        expectedProject.setStorageSize(BigInteger.valueOf(0L));
         ResourceDto expectedDto = ResourceDto.builder()
                 .name("test.txt")
                 .type(ResourceType.TEXT)
@@ -144,8 +134,8 @@ public class ProjectResourceServiceTest {
         ResourceDto resourceDto = projectFileService.uploadFile(multipartFile, 1L, 1L);
 
         assertEquals(expectedDto, resourceDto);
-        assertEquals(expectedProject, project);
-        Mockito.verify(resourceRepository, Mockito.times(1)).save(resource);
+        assertEquals(BigInteger.valueOf(0L), project.getStorageSize());
+        Mockito.verify(resourceRepository, Mockito.times(1)).save(any(Resource.class));
     }
 
     @Test
@@ -180,14 +170,12 @@ public class ProjectResourceServiceTest {
                 .projectId(1L)
                 .build();
 
-        expectedProject.setStorageSize(BigInteger.valueOf(8L));
-
         Mockito.when(resourceRepository.getReferenceById(1L)).thenReturn(resource);
 
         UpdateResourceDto outputDto = projectFileService.updateFile(multipartFileUpdated, 1L, userId);
 
         assertEquals(expectedOutput, outputDto);
-        assertEquals(expectedProject, project);
+        assertEquals(BigInteger.valueOf(8L), project.getStorageSize());
         Mockito.verify(fileService, Mockito.times(1)).delete("p1_4_test.txt");
         Mockito.verify(resourceRepository, Mockito.times(1)).save(resource);
     }
@@ -238,16 +226,15 @@ public class ProjectResourceServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 2})
     public void testDeleteFile_Successful(int userId) {
-        expectedProject.setStorageSize(BigInteger.valueOf(12L));
         project.setStorageSize(BigInteger.valueOf(0L));
         Mockito.when(resourceRepository.getReferenceById(1L)).thenReturn(resource);
 
         projectFileService.deleteFile(1L, userId);
 
-        assertEquals(expectedProject, project);
+        assertEquals(BigInteger.valueOf(12L), project.getStorageSize());
         assertEquals(ResourceStatus.DELETED, resource.getStatus());
-        Mockito.verify(resourceRepository, Mockito.times(1)).save(resource);
-        Mockito.verify(projectRepository, Mockito.times(1)).save(project);
+        Mockito.verify(resourceRepository, Mockito.times(1)).save(any(Resource.class));
+        Mockito.verify(projectRepository, Mockito.times(1)).save(any(Project.class));
     }
 
     @ParameterizedTest

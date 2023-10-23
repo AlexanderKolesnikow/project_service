@@ -50,7 +50,7 @@ public class ProjectResourceController {
         return projectFileService.updateFile(multipartFile, resourceId, userId);
     }
 
-    @GetMapping("/{resourceId}/download/")
+    @GetMapping("/{resourceId}/download")
     @Operation(
             summary = "Download a file",
             description = "Downloads a file from the cloud object storage. File metadata is retrieved from the database.",
